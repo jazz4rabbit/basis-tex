@@ -1,0 +1,70 @@
+\documentclass[a4paper]{article}
+
+\usepackage[top=1in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
+\usepackage{amsfonts, amsmath, amsthm}
+\usepackage[inline]{enumitem}
+\usepackage{graphicx}
+
+\usepackage{thmtools}
+\usepackage{thm-restate}
+
+\usepackage{cite} % multiple cite
+\usepackage{booktabs} % toprule, midrule, bottomrule
+\usepackage{multirow} % multirow, multicolumn
+\usepackage{threeparttable} % tnote; table footnote
+\usepackage[hidelinks]{hyperref} %
+
+\usepackage{xcolor}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+
+
+\algnewcommand\algorithmicto{\textbf{to}}
+\algrenewtext{For}[3]%
+{\algorithmicfor\ #1 $\gets$ #2 \algorithmicto\ #3 \algorithmicdo}
+
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algnewcommand\algorithmicin{\textbf{in}}
+\algrenewtext{ForAll}[2]%
+{\algorithmicforeach\ #1 \algorithmicin\ #2}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+%\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\declaretheorem[name=Proposition]{proposition}
+
+
+
+\title{Epistasis Based Basis Estimation Method for Simplifying the Problem Space of an Evolutionary Search in Binary Representation}
+
+\author{
+	Junghwan Lee\\
+	\texttt{jazz4rabbit@gmail.com}
+	\and
+	Yong-Hyuk Kim\\
+	\texttt{yhdfly@kw.ac.kr}
+}
+\date{}
+
+
+
+\begin{document}
+\maketitle
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+	An evolutionary search space can be smoothly transformed via a suitable change of basis; however, it can be difficult to determine an appropriate basis. In this paper, a method is proposed to select an optimum basis can be used to simplify an evolutionary search space in a binary encoding scheme. The basis search method is based on a genetic algorithm (GA) and the fitness evaluation is based on the epistasis, which is an indicator of the complexity of a genetic algorithm (GA). Two tests were conducted to validate the proposed method when applied to two different evolutionary search problems. The first searched for an appropriate basis to apply, while the second searched for a solution to the test problem. The results obtained after the identified basis had been applied were compared to those with the original basis, and it was found that the proposed method provided superior results.
+\end{abstract}
+
+
+\input{body}
+
+\bibliography{mybib}{}
+\bibliographystyle{unsrt}
+%\bibliographystyle{plain}
+
+\end{document}
