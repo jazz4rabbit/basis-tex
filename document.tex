@@ -5,8 +5,7 @@
 \usepackage[inline]{enumitem}
 \usepackage{graphicx}
 
-\usepackage{thmtools}
-\usepackage{thm-restate}
+\usepackage{thmtools, thm-restate}
 
 \usepackage{cite} % multiple cite
 \usepackage{booktabs} % toprule, midrule, bottomrule
@@ -14,13 +13,15 @@
 \usepackage{threeparttable} % tnote; table footnote
 \usepackage[hidelinks]{hyperref} %
 
-\usepackage{xcolor}
 
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{tikz}
 
+\usepackage{authblk}
 
+
+% algorithm
 \algnewcommand\algorithmicto{\textbf{to}}
 \algrenewtext{For}[3]%
 {\algorithmicfor\ #1 $\gets$ #2 \algorithmicto\ #3 \algorithmicdo}
@@ -30,7 +31,7 @@
 \algrenewtext{ForAll}[2]%
 {\algorithmicforeach\ #1 \algorithmicin\ #2}
 
-
+% theorem, definition, proporision, lemma title
 \newtheorem{theorem}{Theorem}
 \newtheorem{definition}{Definition}
 %\newtheorem{proposition}{Proposition}
@@ -38,33 +39,42 @@
 \declaretheorem[name=Proposition]{proposition}
 
 
+% title
+\title{Epistasis-based Basis Estimation Method for Simplifying the Problem Space of an Evolutionary Search in Binary Representation}
 
-\title{Epistasis Based Basis Estimation Method for Simplifying the Problem Space of an Evolutionary Search in Binary Representation}
-
-\author{
-	Junghwan Lee\\
-	\texttt{jazz4rabbit@gmail.com}
-	\and
-	Yong-Hyuk Kim\\
-	\texttt{yhdfly@kw.ac.kr}
+% maketitle structure
+\makeatletter
+\renewcommand{\maketitle}{\bgroup\setlength{\parindent}{0pt}
+	\begin{flushleft}
+		\textbf{\Large \@title}
+		\vskip 1em
+		\setlength{\leftskip}{2.5 em}
+		\@author
+	\end{flushleft}\egroup
 }
+\makeatother
+\setlength{\affilsep}{0.2em}
+
+% author, affil
+\author{\normalsize \textbf{Junghwan Lee and Yong-Hyuk Kim}}
+\affil{\small Department of Computer Science, Kwangwoon University, 20 Kwangwoon-ro, Nowon-gu, Seoul 01897, Republic of Korea}
+\affil{ Correspondence should be addressed to Yong-Hyuk Kim; yhdfly@kw.ac.kr}
 \date{}
 
 
-
 \begin{document}
-\maketitle
+	\maketitle
 	
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{abstract}
-	An evolutionary search space can be smoothly transformed via a suitable change of basis; however, it can be difficult to determine an appropriate basis. In this paper, a method is proposed to select an optimum basis can be used to simplify an evolutionary search space in a binary encoding scheme. The basis search method is based on a genetic algorithm (GA) and the fitness evaluation is based on the epistasis, which is an indicator of the complexity of a genetic algorithm (GA). Two tests were conducted to validate the proposed method when applied to two different evolutionary search problems. The first searched for an appropriate basis to apply, while the second searched for a solution to the test problem. The results obtained after the identified basis had been applied were compared to those with the original basis, and it was found that the proposed method provided superior results.
-\end{abstract}
-
-
-\input{body}
-
-\bibliography{mybib}{}
-\bibliographystyle{unsrt}
-%\bibliographystyle{plain}
-
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\begin{abstract}
+		An evolutionary search space can be smoothly transformed via a suitable change of basis; however, it can be difficult to determine an appropriate basis. In this paper, a method is proposed to select an optimum basis can be used to simplify an evolutionary search space in a binary encoding scheme. The basis search method is based on a genetic algorithm and the fitness evaluation is based on the epistasis, which is an indicator of the complexity of a genetic algorithm. Two tests were conducted to validate the proposed method when applied to two different evolutionary search problems. The first searched for an appropriate basis to apply, while the second searched for a solution to the test problem. The results obtained after the identified basis had been applied were compared to those with the original basis, and it was found that the proposed method provided superior results.
+	\end{abstract}
+	
+	
+	\input{body}
+	
+	\bibliography{mybib}{}
+	\bibliographystyle{unsrt}
+	%\bibliographystyle{plain}
+	
 \end{document}
