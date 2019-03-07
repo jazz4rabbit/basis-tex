@@ -15,3 +15,9 @@ cd flowchart/
 pdflatex flowchart.tex
 pdftops -eps flowchart.pdf
 ```
+
+# Compile ToReferees
+``` bash
+cd ToReferees
+pdflatex ToReferees.tex
+```

@@ -2,9 +2,14 @@
 \section{Introduction}
 Binary encoding typically uses a standard basis, and when a non-standard basis is used, the structure of the problem space may become quite different from that of the original problem. In an evolutionary search, various methods can be used to change a problem space by adjusting the basis, including gene rearrangement, different encoding methods, and the use of an eigen-structure ~\cite{hwang2006multi, CHANG20091210, sankoff1998multiple, raidl2000weighted, falkenauer1994new, gen2006genetic, wang2009genetic, lotfi2013genetic, pernkopf2001feature, wang2006new, wu2012novel, wyatt2003finding}.
 
-An investigation was conducted to elucidate the possibility of changing the basis in binary encoding and the corresponding effects on the genetic algorithm (GA)~\cite{kim2008effect}; however, it was not possible to determine which basis should be applied to smooth the problem search space. In genetics, epistasis means that the phenotypic effect of one gene is masked by another gene; however, in GA, it refers to any type of gene interaction. In a problem with a large epistasis, as the genes are extremely inter-dependent, the fitness landscape of the problem space is very complex and the problem is difficult~\cite{davidor1990epistasis}. Several studies have been conducted to assess the difficulty of problems from the perspective of epistasis~\cite{seo2003new, seo2004new, ventresca2007epistasis, seo2005computing, reeves1995epistasis, naudts2000comparison, beasley1993reducing}.
+An investigation was conducted to elucidate the possibility of changing the basis in binary encoding and the corresponding effects on the genetic algorithm (GA)~\cite{kim2008effect}; however, it was not possible to determine which basis should be applied to smooth the problem search space. In genetics, epistasis means that the phenotypic effect of one gene is masked by another gene; however, in GA, it refers to any type of gene interaction. In a problem with a large epistasis, as the genes are extremely inter-dependent, the fitness landscape of the problem space is very complex and the problem is difficult~\cite{davidor1990epistasis}.
+Several studies have been conducted to assess the difficulty of problems from the perspective of epistasis~\cite{seo2003new, seo2004new, ventresca2007epistasis, seo2005computing, reeves1995epistasis, naudts2000comparison, beasley1993reducing}.
+Epistasis has the advantage that it is possible to measure the extent of nonlinearity only with fitness function.
+In this paper, we define the difficulty of the problem or problem search space as the nonlinearity level of gene expression. Also, we use epistasis as a measure for the difficulty of the problem.
+
 
 There are three main contributions of this paper. First, an epistasis approximation is used to identify a basis that will reduce the complexity of an evolutionary search problem. Second, the basis is expressed by a variable-length encoding scheme using an elementary matrix. Finally, a GA is defined that can be used to change the basis of an evolutionary search space. This means that when a basis is given, one can tell how it affects the GA.
+Our intention in this study is that a non-separable problem can be transformed into a separable problem by performing an appropriate basis transformation. Such an altered environment enables GA to search space effectively.
 
 This paper is organized as follows: Section~\ref{sec2:motivation} describes the principle of reducing the complexity of a problem space in an evolutionary search by changing the basis and presents the motivation for evaluating the basis using the epistasis. In Section~\ref{sec3:cob}, a method is introduced for changing a standard basis to another basis for a binary encoding problem. Then, a GA is introduced that can be used to apply a change of basis. Once an appropriate basis has been selected, this algorithm is more efficient at searching for a solution than the conventional GA. In Section~\ref{sec4:eval_basis}, a method is proposed for estimating a basis that reduces the complexity of an evolutionary search problem. Section~\ref{sec5:find_basis_GA} describes a GA that can be used to search for a basis by applying the proposed estimation method. Here, a variable length encoding scheme that consists of an elementary matrix is employed so to increase the efficiency of the search for an appropriate basis in the problem space. Section~\ref{sec6:experiments} presents a description of the tests used to validate the method and then discusses the results. In the tests, an appropriate basis for the target problem is found via the GA, and then the identified basis is applied to the target problem. The conclusions that can be drawn from this study are presented in Section~\ref{sec7:conclusions}.
 
@@ -15,11 +20,6 @@ In this section, the concept of the epistasis is introduced as a means of estima
 
 \subsection{An Example of Changing a Basis in \boldmath$\mathbb{R}^n$}
 A PCA is used to obtain the principal components of the data by transforming the data into a new coordinate system via an orthogonal transformation. When the data is projected in the coordinate system, the position where the variance is the largest becomes the first principal component. The second principal component is in a position that is orthogonal to the previous component at the position with the second largest variance. Consequently, if the eigenvectors and eigenvalues of the covariance matrix are obtained and sorted in descending order, the principal components can be found. This is identical to changing the basis from the original coordinate system to a coordinate system based on the variance of the data. In general, by using only the important principal components, lost data are used. 
-%Figure~\ref{fig:pca} depicts the data describing the three-dimensional space using the data of the two principal components.
-%
-%\begin{figure} [ht!]
-%	\caption{Three-dimensional data representing the two principal components obtained via the PCA algorithm.} \label{fig:pca}
-%\end{figure}
 
 \subsection{Change of Basis in Binary Representation} \label{sec22:cob}
 Binary encoding typically employs a standard basis; however, it is sometimes easier to manipulate a problem in a non-standard basis. The following example illustrates that the relationship between the basis vectors is dependent on the basis. Here, $ \mathbb{Z}_2 $ is a field that has elements of zero and one, the addition operator corresponds to the exclusive-or (XOR) operator, and the multiplication operator corresponds to the AND operator. The standard basis $ B_s $ for vector space $ \mathbb{Z}_2^n $ is $ \left\{e_1,e_2,\ldots,e_n\right\} $, where $ e_i $ consists of column vectors in which the $ i $-th entry is one and the remaining $ n-1 $ entries are zero.
@@ -47,7 +47,7 @@ F\left(v\right)=\sum_{i=1}^{n}{\left(\alpha_1\oplus\alpha_2\oplus\cdots\oplus\al
 %\sum_{i=1}^{n}\left(\sum_{j=1}^{n}{\alpha_i+\alpha_j}\right)
 \end{equation*}
 It can be seen that the basis vector $ e_i^\prime $ of $ B $ is independent of the other basis vectors in $ F^\prime $. In fact, $ F^\prime  $ is identical to the onemax problem that counts the number of ones in a bitstring. Therefore, for a vector in which all $ \alpha_i^\prime $ are set to one, the evaluation value becomes the largest value, and if this vector is transformed with the standard basis, an optimum solution can be obtained. Figure~\ref{fig:rel} shows the relationships of the basis vectors according to the basis with $ n = 6 $ in the graphs.
-\begin{figure}[ht!]
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}
 	\def \n {6}
@@ -83,8 +83,9 @@ In a GA, the epistasis indicates the correlation between the genes. If the epist
 The results of calculating the epistasis according to the problem size $ n $ of evaluation functions $ F $ and $ F^\prime $ in Section~\ref{sec22:cob} are shown in Table~\ref{tab:epi_func}. In this paper, the method proposed by Davidor~\cite{davidor1990epistasis} is used to compute the epistasis. In $ F $, because the dependency relationship with other basis vectors increases as $ n $ increases, the epistasis also increases. However, for $ F^\prime $, since the basis vectors are independent, the epistasis is zero. Thus, it is expected that the search space can be simplified via an appropriate change of basis.
 
 The epistasis can be used to check if the search space can be simplified by using a particular basis. If the epistasis of the problem after changing the basis is lower than the epistasis of the original problem, then this indicates that the problem has become easier. However, using the epistasis in this way requires all solutions to be searched. An alternative is to estimate the actual epistasis by calculating the epistasis of a sample set of solutions.
+Note that nonlinearity may be misleading due to approximation error by solution sampling. It hinders to find the proper basis for the target problem. The target problem may be transformed into a more complex problem through a basis transformation. That is, the basis transformation can rather prevent a GA from efficiently finding the solution.
 
-\begin{table}
+\begin{table}[H]
 	\caption{Epistasies of evaluation functions $ F $ and $ F^\prime $.} \label{tab:epi_func}
 	\vspace*{0.2cm}
 	\centering
@@ -106,6 +107,11 @@ The epistasis can be used to check if the search space can be simplified by usin
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Change of Basis} \label{sec3:cob}
+This section presents a GA that performs an effective search through a change of basis. Before presenting the GA, we introduce the related terminologies and theories of change of basis in binary representation.
+Next, we apply the change of basis in the onemax problem to show how the problem actually transformed. In addition, a methodology for evaluating solutions in the transformed problem will be described.
+Finally, we propose a GA that effectively searches solutions through applying the change of basis.
+On the other hand, searching for an appropriate basis will be covered in Sections~\ref{sec4:eval_basis} and \ref{sec5:find_basis_GA}.
+
 \subsection{Change of Basis in \boldmath$ \mathbb{Z}_2^n $}
 A basis for an $ n $-dimensional vector space is a subset that consists of $ n $ vectors and every element of the space can be uniquely represented as a linear combination of basis vectors. Since it is possible to use one or more bases in a vector space, the coordinate representation of a vector with respect to the basis can be transformed via an equivalent representation to other bases via the invertible linear transformation. Such a transformation is called a \textit{change of basis}. The following theorem was derived from the basic theory of linear algebra~\cite{friedberglinear}.
 \begin{theorem} \label{thm:2base}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
@@ -119,7 +125,8 @@ The onemax problem maximizes the number of ones in a bitstring and has zero epis
 T=\left(\begin{matrix}1&0&0\\1&0&1\\0&1&0\\\end{matrix}\right).
 \end{equation*}
 Then, it can be shown that $ B_T=\left\{Te_1,Te_2,Te_3\right\}=\left\{\left(\begin{matrix}1\\1\\0\\\end{matrix}\right),  \left(\begin{matrix}0\\0\\1\\\end{matrix}\right),\left(\begin{matrix}0\\1\\0\\\end{matrix}\right)\right\}$. Table~\ref{tab:onemax} shows the original vector and that obtained using $ Tv=\left[v\right]_{B_T} $. From this, it can be seen that after the basis change, the problem became more complex.
-\begin{table}[ht!]
+
+\begin{table}[H]
 	\caption{The vectors with a modified basis $ B_T $ and the original vectors in the onemax problem of size 3.} \label{tab:onemax}
 	\centering
 	\vspace{0.2cm}
@@ -138,6 +145,7 @@ Then, it can be shown that $ B_T=\left\{Te_1,Te_2,Te_3\right\}=\left\{\left(\beg
 		\bottomrule
 	\end{tabular}
 \end{table}
+
 The evaluation function $ F $ of the onemax problem is as follows:
 \begin{equation*}
 F\left(v\right)=\sum_{i=1}^{n}\alpha_i,\ \text{where}\ v=\sum_{i=1}^{n}{\alpha_ie_i}.
@@ -163,12 +171,12 @@ In general, a GA is expected be more efficient when searching for a solution to 
 			\item by using the genetic operator on the GA, the offspring population $ O^\prime $ is produced from $ P^\prime $.
 			\item the fitness of $ O^\prime $ is evaluated using the population $ O $ that was used to change the basis from $ B $ to $ B_s $.
 			\item $ P^\prime $ and $ O^\prime $ are used to create a new generation and update $ P^\prime $ to the new generation.
-			\item the process from Step 3 onward is repeated as many times as there are generations. When the number of generations has been exceeded, then $ P^\prime $ is returned.
+			\item the process from Step 3 onward is repeated as many times as there are generations. When the number of generations has been exceeded, then we return $ P^\prime $ whereby the basis $ B $ is changed to the standard basis $ B_s $.
 		\end{enumerate}
 	\end{algorithmic}
 \end{algorithm}
 
-\begin{figure}[ht!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{./flowchart_change_basis}
 	\caption{Flowchart of a GA with a change of basis.} \label{fig:flowchart}
@@ -344,7 +352,7 @@ In this section, two problems are described for which better solutions can be ob
 \begin{enumerate}
 	\item  Variant-onemax: for the evaluation function $ F $ of the onemax problem, vector $ v $ has an evaluation value of one. Variant-onemax is defined as counting the number of ones by changing vector $ v $ from the standard basis to a certain basis $ B $. That is, in variant-onemax, $ F\left(\left[v\right]_B\right) $ becomes the evaluation value for vector $ v $.
 	
-	If the basis is changed for $ v $ with the nonsingular binary matrix $ \left[T\right]_{B_s}^B $, then we have $ \left[T\right]_{B_s}^Bv=\left[v\right]_B $. Then, $ F\left(\left[v\right]_B\right) $ becomes a function that counts the number of 1s in $ \left[v\right]_B $. This is therefore identical to the onemax problem as a result of an appropriate change of basis in variant-onemax. Meanwhile, from $ F\left(\left[v\right]_B\right)=F\left(\left[T\right]_{B_s}^Bv\right) $, an evaluation function of variant-onemax can be generated even when a nonsingular binary matrix is given. As for the optimum solution of variant-onemax, when the problem size is $ n $, the number of ones becomes $ n $ through the change of basis, and $ n $ becomes the optimal solution.
+	If the basis is changed for $ v $ with the nonsingular binary matrix $ \left[T\right]_{B_s}^B $, then we have $ \left[T\right]_{B_s}^B v=\left[v\right]_B $. Then, $ F\left(\left[v\right]_B\right) $ becomes a function that counts the number of 1s in $ \left[v\right]_B $. This is therefore identical to the onemax problem as a result of an appropriate change of basis in variant-onemax. Meanwhile, from $ F\left(\left[v\right]_B\right)=F\left(\left[T\right]_{B_s}^Bv\right) $, an evaluation function of variant-onemax can be generated even when a nonsingular binary matrix is given. As for the optimum solution of variant-onemax, when the problem size is $ n $, the number of ones becomes $ n $ through the change of basis, and $ n $ becomes the optimal solution.
 	
 	\item $ NK $-landscape: the $ NK $-landscape model consists of a string of length $ N $ and a fitness contribution is attributed to each character depending on the other $ K $ characters. These fitness contributions are often randomly chosen from a particular probability distribution. In addition, the number of hills and valleys can be adjusted by varying $ N $ and $ K $. One of the reasons why the $ NK $-landscape model is used in optimization is that it is a simple instance of an NP-hard problem.
 	
@@ -359,45 +367,46 @@ In the experiment, instances of variant-onemax where $ n $ was 20, 30, and 50 we
 
 A total of 100 independent searches were conducted for each instance, and the number of times that an optimum solution was identified was counted along with the execution time. The results for the variant-onemax experiment are shown in Table~\ref{tab:result_var}. In the table, a type of `Original' indicates that a solution instance was evaluated without a change of basis. Similarly, `Meta,' `Epistasis-sq,' and `Epistais-cu' refer to evaluating solution instances by applying $ B_1,B_2 $, and $ B_3 $, respectively, to change the basis. In addition, the box plot in Figure~\ref{fig:boxplot_var} depicts the fitness distribution of the 100 best solutions obtained by performing 100 independent searches for each instance. A fitness is a value between zero and one that can be obtained by dividing the fitness of the optimum solution. That is, a value of one on the $ y $-axis indicates the fitness of an optimum solution, while values approaching zero indicate a lower fitness. In most cases, it can be seen that the search performance of the GA is efficient with the change of basis. When $ N $ is 50, `Epistasis-cu' does not seem to improve the search performance of the GA. This was likely because the population of the GA was not evenly distributed throughout the sample population.
 
-In general, good results were obtained by the method that searched for a solution using the basis obtained by the meta-GA. In particular, when $ n $ was 30, the 82nd most optimal solution was obtained out of 100. This indicates that the corresponding basis was appropriate. However, because the computation time for this approach was very long, it cannot be applied in practice. Furthermore, when $ n $ was 50, no difference was observed when compared to the case in which the basis was not changed. The method of evaluating the basis using the epistasis provides a good indication of when changing the basis will provide a better result. In summary, these tests confirmed that a sample size of $ n^2 $ provided good results while requiring less time than a sample size of $ n^3 $. Therefore, in terms of time and performance, a sample size of $ n^2 $ was deemed reasonable for estimating an epistasis.
+
+In Table~\ref{tab:result_var}, `Meta' found opimal solutions more frequently than the other methods. In particular, when $ n $ was 30, the 82nd most optimal solution was obtained out of 100. This indicates that the corresponding basis was appropriate. However, because the computation time for this approach was very long, it cannot be applied in practice. Note that when $ n $ is 50, it was over 2 hours. Furthermore, no difference was observed when compared to the case in which the basis was not changed. The method of evaluating the basis using the epistasis provides a good indication of when changing the basis will provide a better result. In particular, when $ n $ is 20, the number of optima found in `Original' is 30, and the numbers of optima found in `Epistasis-sq' and `Epistasis-cu' are 64 and 33, respectively. In summary, these tests confirmed that a sample size of $ n^2 $ provided good results while requiring less time than a sample size of $ n^3 $. Therefore, in terms of time and performance, a sample size of $ n^2 $ was deemed reasonable for estimating an epistasis.
 
 
-\begin{table}[ht!]
+\begin{table}[H]
 	\centering
+	\caption{Results of each of the best solutions obtained by conducting the GA experiments 100 times on an instance of the variant-onemax problem. (`\# of optima' is the number of optima found during 100 experiments, `Average' is the average of 100 best solutions, and `SD' is the standard deviation of 100 best solutions. $ Q_1, \, Q_2, $ and $ Q_3 $ are the first, second, and third quartiles, respectively. `Time' is the sum of the time to search for the basis and that for the GA experiments.)} \label{tab:result_var}
+	\vspace*{0.2cm}
 	\begin{threeparttable}
-		\caption{Results from the variant-onemax problem.} \label{tab:result_var}
-		\begin{tabular}{cccc}
-			\toprule
-			$ n $ & Type & \# of optimum & Computing time (mm:ss)\tnote{*} \\
-			\midrule
-			\multirow{4}{*}{20} & Original		& 30 & 0:44 \\
-			& Meta			& 66 & 3:07 \\
-			& Epistasis-sq	& 64 & 1:01 \\
-			& Epistasis-cu	& 33 & 3:11 \\
-			\midrule
-			\multirow{4}{*}{30} & Original		& 31 & 1:09  \\
-			& Meta			& 82 & 12:15 \\
-			& Epistasis-sq	& 47 & 3:49  \\
-			& Epistasis-cu	& 40 & 7:03  \\
-			\midrule
-			\multirow{4}{*}{50} & Original		& 0  & 2:58   \\
-			& Meta			& 0  & 136:46 \\
-			& Epistasis-sq	& 2	 & 7:48   \\
-			& Epistasis-cu	& 0	 & 67:59  \\	
-			\bottomrule
-		\end{tabular}
-		\begin{tablenotes}
-			\footnotesize
-			\item[*] On Intel (R) Core TM i7-6850K CPU @ 3.60GHz
-		\end{tablenotes}
+	\begin{tabular}{ccccccccr@{:}l}
+	\toprule
+	$ n $ & Type & \# of optima & Average & SD & $ Q_1 $ & $ Q_2 $ & $ Q_3 $ &  \multithead{2}{Time \\ (mm:ss)\tnote{*}} \\
+	\midrule
+	\multirow{4}{*}{20} & Original		& 30 & 0.945 & 0.0452 & 0.900 & 0.950 & 1.000 & 0 & 44 \\
+		                & Meta			& 66 & 0.980 & 0.0302 & 0.950 & 1.000 & 1.000 & 3 & 07 \\
+		                & Epistasis-sq	& 64 & 0.982 & 0.0241 & 0.950 & 1.000 & 1.000 & 1 & 01 \\
+		                & Epistasis-cu	& 33 & 0.964 & 0.2760 & 0.950 & 0.950 & 1.000 & 3 & 11 \\
+	\midrule
+	\multirow{4}{*}{30} & Original		& 31 & 0.963 & 0.0329 & 0.930 & 0.970 & 1.000 & 1 & 09  \\
+               			& Meta			& 82 & 0.993 & 0.0155 & 1.000 & 1.000 & 1.000 & 12 & 15 \\
+						& Epistasis-sq	& 47 & 0.979 & 0.0216 & 0.967 & 0.967 & 1.000 & 3 & 49  \\
+						& Epistasis-cu	& 40 & 0.979 & 0.0187 & 0.967 & 0.967 & 1.000 & 7 & 03  \\
+	\midrule
+	\multirow{4}{*}{50} & Original		& 0  & 0.931 & 0.0257 & 0.920 & 0.940 & 0.940 & 2 & 58   \\
+						& Meta			& 0  & 0.939 & 0.0240 & 0.920 & 0.940 & 0.960 & 136 & 46 \\
+						& Epistasis-sq	& 2	 & 0.934 & 0.0272 & 0.920 & 0.940 & 0.945 & 7 & 48   \\
+						& Epistasis-cu	& 0	 & 0.927 & 0.0272 & 0.900 & 0.920 & 0.940 & 67 & 59  \\	
+	\bottomrule
+	\end{tabular}
+	\begin{tablenotes}
+		\footnotesize
+		\item[*] On Intel (R) Core TM i7-6850K CPU @ 3.60GHz
+	\end{tablenotes}
 	\end{threeparttable}
 \end{table}
 
-
-\begin{figure}[ht!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./boxplot_Onemax}
-	\caption{Box plot of 100 best fits obtained when searching for a solution in the variant-onemax problem.} \label{fig:boxplot_var}
+	\caption{A box plot of each of the best solutions obtained by conducting the GA experiment 100 times on an instance of the variant-onemax problem.} \label{fig:boxplot_var}
 \end{figure}
 
 The value of $ N $ in the $ NK $-landscape experiment represents the size of the problem. In this experiment, there were $ N $ characters of zero and one and the total number of populations was $ 2^N $. The evaluation functions were randomly generated according to $ K $. In terms of the instance generation, each gene was dependent on $ K $ other genes and a value between $ \left[0,1\right] $ was assigned. The fitness of the $ NK $-landscape is based on the fitness of each gene. Therefore, the maximum and minimum fitness values, which are between zero and one, may be different for each instance. In the experiment, 100 independent searches for a solution are conducted for each instance. Table~\ref{tab:result_nk} shows the results of $ NK $-landscape experiment in which the best solution and the computation time for each of the 100 searches were compared. In the table, when the type is `Epistasis,' this indicates that a basis was obtained based on the epistasis using a sample set of size $ n^2 $, and which 100 independent searches were conducted for that instance. A box plot showing the distribution of the 100 best solutions is shown in Figure~\ref{fig:boxplot_nk}.
@@ -405,110 +414,123 @@ The value of $ N $ in the $ NK $-landscape experiment represents the size of the
 Upon analysis, the method of searching for the solution after changing the basis exhibited better performance than the original problem. In particular, in the box plot, it can be seen that the distribution of solutions obtained by changing the basis was more concentrated and had a higher mean. In the $ NK $-landscape, when `Meta' and `Epistasis' were compared, neither side exhibited better performance. However, it can be seen that the computation time of ‘Meta’ was about 4–30 times longer than that of `Epistasis.' Furthermore, although the `Epistasis' consumed slightly more time than the `Original,' it tended to have a more efficient evolutionary search. For these reasons, the method used to obtain the `Epistasis' results was found to be the best among the three methods evaluated.
 
 
-\begin{table}[ht!]
+\begin{table}[H]
 	\centering
+		\caption{Results of each of the best solutions obtained by conducting the GA experiments 100 times on an instance of the $ NK $-landscape problem. (`Best' is the best fitness among solutions found in 100 experiments, `Average' is the average of 100 best solutions, and `SD' is the standard deviation of 100 best solutions. $ Q_1, \, Q_2, $ and $ Q_3 $ are the first, second, and third quartiles, respectively. `Time' is the sum of the time to search for the basis and that for the GA experiments.)} \label{tab:result_nk}
+	\vspace*{0.2cm}
 	\begin{threeparttable}
-		\caption{Results in the $ NK $-landscape problem.} \label{tab:result_nk}
-		\begin{tabular}{cccc}
-			\toprule
-			$ N,\, K$ & Type & Optimum & Computing time (mm:ss)\tnote{*} \\
-			\midrule
-			\multirow{3}{*}{20, 3}	& Original		& 0.817 & 1:02 \\
-			& Meta			& 0.825 & 5:52 \\
-			& Epistasis		& 0.820 & 1:32 \\
-			\midrule
-			\multirow{3}{*}{20, 5}	& Original		& 0.761 & 1:03 \\
-			& Meta			& 0.761 & 5:39 \\
-			& Epistasis		& 0.761 & 1:40 \\
-			\midrule
-			\multirow{3}{*}{20, 10}	& Original		& 0.779 & 1:10 \\
-			& Meta			& 0.786 & 7:13 \\
-			& Epistasis		& 0.786 & 2:16 \\
-			\midrule
-			\multirow{3}{*}{30, 3}	& Original		& 0.776 & 2:06 \\
-			& Meta			& 0.776 & 5:39 \\
-			& Epistasis		& 0.776 & 1:40 \\
-			\midrule
-			\multirow{3}{*}{30, 5}	& Original		& 0.785 & 2:06 \\
-			& Meta			& 0.785 & 32:28 \\
-			& Epistasis		& 0.785 & 2:50 \\
-			\midrule
-			\multirow{3}{*}{30, 10}	& Original		& 0.779 & 2:06 \\
-			& Meta			& 0.796 & 49:47 \\
-			& Epistasis		& 0.796 & 3:48 \\
-			\midrule
-			\multirow{3}{*}{30, 20}	& Original		& 0.750 & 2:51 \\
-			& Meta			& 0.762 & 49:47 \\
-			& Epistasis		& 0.770 & 3:48 \\
-			\midrule
-			\multirow{3}{*}{50, 3}	& Original		& 0.776 & 5:31 \\
-			& Meta			& 0.776 & 220:14 \\
-			& Epistasis		& 0.776 & 6:34 \\
-			\bottomrule
-		\end{tabular}
-		\begin{tablenotes}
-			\footnotesize
-			\item[*] On Intel (R) Core TM i7-6850K CPU @ 3.60GHz
-		\end{tablenotes}
+	\begin{tabular}{ccccccccr@{:}l}
+	\toprule
+	$ N,\, K$ & Type & Best & Average & SD & $ Q_1 $ & $ Q_2 $ & $ Q_3 $ & \multithead{2}{Time \\ (mm:ss)\tnote{*}} \\
+	\midrule
+	\multirow{3}{*}{20, 3}	& Original  & 0.817 & 0.8135 & 0.0085 & 0.8170 & 0.8170 & 0.8170 & 1 & 02 \\
+							& Meta	    & 0.825 & 0.8226 & 0.0057 & 0.8250 & 0.8250 & 0.8250 & 5 & 52 \\
+							& Epistasis & 0.825 & 0.8200 & 0.0056 & 0.8170 & 0.8170 & 0.8250 & 1 & 32 \\
+	\midrule
+	\multirow{3}{*}{20, 5}	& Original  & 0.761 & 0.7449 & 0.0157 & 0.7400 & 0.7405 & 0.7610 & 1 & 03 \\
+							& Meta	    & 0.761 & 0.7533 & 0.0131 & 0.7470 & 0.7610 & 0.7610 & 5 & 39 \\
+							& Epistasis & 0.761 & 0.7505 & 0.0109 & 0.7460 & 0.7470 & 0.7610 & 1 & 40 \\
+	\midrule
+	\multirow{3}{*}{20, 10}	& Original  & 0.779 & 0.7306 & 0.0253 & 0.7020 & 0.7335 & 0.7520 & 1 & 10 \\
+							& Meta      & 0.785 & 0.7572 & 0.0155 & 0.7660 & 0.7550 & 0.7660 & 7 & 13 \\
+							& Epistasis & 0.785 & 0.7558 & 0.0136 & 0.7460 & 0.7530 & 0.7653 & 2 & 16 \\
+	\midrule
+	\multirow{3}{*}{30, 3}	& Original  & 0.776 & 0.7687 & 0.1373 & 0.7740 & 0.7760 & 0.7760 & 2 & 06 \\
+							& Meta      & 0.776 & 0.7719 & 0.0109 & 0.7760 & 0.7760 & 0.7760 & 5 & 39 \\
+							& Epistasis & 0.776 & 0.7718 & 0.0090 & 0.7740 & 0.7760 & 0.7760 & 1 & 40 \\
+	\midrule
+	\multirow{3}{*}{30, 5}	& Original  & 0.795 & 0.7725 & 0.0125 & 0.7638 & 0.7740 & 0.7870 & 2 & 06 \\
+							& Meta      & 0.795 & 0.7661 & 0.0170 & 0.7540 & 0.7710 & 0.7770 & 32 & 28 \\
+							& Epistasis & 0.795 & 0.7706 & 0.0136 & 0.7623 & 0.7730 & 0.7830 & 2 & 50 \\
+	\midrule
+	\multirow{3}{*}{30, 10}	& Original  & 0.779 & 0.7349 & 0.0181 & 0.7260 & 0.7310 & 0.7443 & 2 & 06 \\
+							& Meta      & 0.805 & 0.7391 & 0.0179 & 0.7310 & 0.7370 & 0.7470 & 49 & 47 \\
+							& Epistasis & 0.796 & 0.7366 & 0.0198 & 0.7220 & 0.7335 & 0.7960 & 3 & 48 \\
+	\midrule
+	\multirow{3}{*}{30, 20}	& Original  & 0.750 & 0.7039 & 0.0152 & 0.6938 & 0.7010 & 0.7113 & 2 & 51 \\
+							& Meta      & 0.762 & 0.7181 & 0.0163 & 0.7070 & 0.7155 & 0.7243 & 49 & 47 \\
+							& Epistasis & 0.770 & 0.7220 & 0.0133 & 0.7120 & 0.7200 & 0.7300 & 3 & 48 \\
+	\midrule
+	\multirow{3}{*}{50, 3}	& Original  & 0.776 & 0.7576 & 0.0102 & 0.7515 & 0.7590 & 0.7640 & 5 & 31 \\
+							& Meta      & 0.776 & 0.7599 & 0.0119 & 0.7530 & 0.7585 & 0.7730 & 220 & 14 \\
+							& Epistasis & 0.776 & 0.7578 & 0.0096 & 0.7508 & 0.7590 & 0.7630 & 6 & 34 \\
+	\bottomrule
+	\end{tabular}
+	\begin{tablenotes}
+		\footnotesize
+		\item[*] On Intel (R) Core TM i7-6850K CPU @ 3.60GHz
+	\end{tablenotes}
 	\end{threeparttable}
 \end{table}
 
 
-\begin{figure}[ht!]
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.8\textwidth]{./boxplot_NK}
-	\caption{Box plot of the results in the $ NK $-landscape problem.} \label{fig:boxplot_nk}
+	\caption{A box plot of each of the best solutions obtained by conducting the GA experiment 100 times on an instance of the $ NK $-landscape problem.} \label{fig:boxplot_nk}
 \end{figure}
 
 \subsection{Experimental Analysis}
 The results of the above experiments confirmed that a basis obtained by estimating the epistasis improved the efficiency of searching for a solution using a GA. In this section, an analysis is performed to examine how much the basis found in the experiment reduced the epistasis. The basis was estimated in such a way that the epistasis of the sample population $ S $ was reduced. Whether the GA proposed in Section~\ref{sec5:find_basis_GA} was effective can be confirmed by comparing the epistasis of $ S $ and that of $ S^\prime $ in which the basis was changed to the one identified by the search $ S $. It is expected that the latter epistasis will be smaller.
 
-A comparison of the epistasies between $ S $ and $ S^\prime $ in the variant-onemax and $ NK $-landscape experiments can be seen in Tables~\ref{tab:epi_var} and~\ref{tab:epi_nk}, respectively. First, in Table~\ref{tab:epi_var}, $ n $ is the chromosome length of the variant-onemax experiment. The sizes of the sample sets were $ n^2 $ and $ n^3 $, respectively; `before' and `after' show the epistasies of $ S $ and $ S^\prime $, respectively. For every $ n $, it was confirmed that a lower epistasis value was obtained when the basis was changed. Moreover, when the sampling size was `square', the epistasis was reduced more compared to the `cubic'. Thus, there was a higher possibility that the GA would conduct a more efficient search and find a better solution. When $ n $ was 20, since there were $ 2^{20} $ solutions, the epistasis for all the solutions, not the sample sets, can be obtained. Here, it was confirmed that the epistasis was 4.50, and since the epistasis was 4.46 and 4.35 when the sampling sizes were square and cubic, respectively, this indicates that the original epistasis was accurately estimated.
+A comparison of the epistasies between $ S $ and $ S^\prime $ in the variant-onemax and $ NK $-landscape experiments can be seen in Tables~\ref{tab:epi_var} and~\ref{tab:epi_nk}, respectively. First, in Table~\ref{tab:epi_var}, $ n $ is the chromosome length of the variant-onemax experiment. The sizes of the sample sets were $ n^2 $ and $ n^3 $, respectively; `Before' and `After' show the epistasies of $ S $ and $ S^\prime $, respectively. For every $ n $, it was confirmed that a lower epistasis value was obtained when the basis was changed. Moreover, when the sampling size was `square', the epistasis was reduced more compared to the `cubic'. Thus, there was a higher possibility that the GA would conduct a more efficient search and find a better solution. When $ n $ was 20, since there were $ 2^{20} $ solutions, the epistasis for all the solutions, not the sample sets, can be obtained. Here, it was confirmed that the epistasis was 4.50, and since the epistasis was 4.46 and 4.35 when the sampling sizes were square and cubic, respectively, this indicates that the original epistasis was accurately estimated.
 
-In Section~\ref{sec52:crossover}, the size of the sample set $ S $ in the $ NK $-landscape experiment was $ N^2 $. Table~\ref{tab:epi_nk} shows the epistasies of $ S $ and $ S^\prime $ after the basis was changed, respectively, for the values of $ N,K $ used in the experiment. The `before' and `after' results indicate the epistasies of $ S $ and $ S^\prime $, respectively. As in the case of the variant-onemax experiment, it was confirmed that for every $ n $, a lower value of epistasis was obtained when a change of basis was applied. When $ N $ was $ 20 $, the epistasis for all the solutions, but not the samplings, was obtained. When $ K $ was 3, 5, and 10, the epistasis was $ 3.24e^{-3},\ 3.38e^{-3},\ \text{and}\ 4.13e^{-3} $, respectively. These values are close to the respective epistases of $ S $, $ 3.17e^{-3},\ 3.16e^{-3},\ \text{and}\ 4.28e^{-3} $.
+In Section~\ref{sec52:crossover}, the size of the sample set $ S $ in the $ NK $-landscape experiment was $ N^2 $. Table~\ref{tab:epi_nk} shows the epistasies of $ S $ and $ S^\prime $ after the basis was changed, respectively, for the values of $ N,K $ used in the experiment. The `Before' and `After' results indicate the epistasies of $ S $ and $ S^\prime $, respectively. As in the case of the variant-onemax experiment, it was confirmed that for every $ n $, a lower value of epistasis was obtained when a change of basis was applied. When $ N $ was $ 20 $, the epistasis for all the solutions, but not the samplings, was obtained. When $ K $ was 3, 5, and 10, the epistasis was $ 3.24e^{-3},\ 3.38e^{-3},\ \text{and}\ 4.13e^{-3} $, respectively. These values are close to the respective epistases of $ S $, $ 3.17e^{-3},\ 3.16e^{-3},\ \text{and}\ 4.28e^{-3} $.
 
 
-\begin{table}[ht!]
+\begin{table}[H]
 	\caption{Epistasis of the original and modified basis sampling in the variant-onemax problem.} \label{tab:epi_var}
 	\vspace*{0.2cm}
 	\centering
-	\begin{tabular}{cccc}
+	\begin{threeparttable}
+		\begin{tabular}{ccccc}
 		\toprule
-		\multirow{2}{*}{$ n $} & \multirow{2}{*}{Sampling size} & \multicolumn{2}{c}{Epistasis} \\	\cmidrule(lr){3-4}
-		
-		& & before & after \\
+		\multirow{2.5}{*}{$ n $} & \multirow{2.5}{*}{Sampling size} & \multicolumn{3}{c}{Epistasis} \\	\cmidrule(lr){3-5}
+		& & Before & After & Decrease rate (\%)\tnote{*}       \\
 		\midrule
-		\multirow{2}{*}{20} & square	& 4.46 & 3.23 \\
-		& cubic		& 4.35 & 3.83 \\
+		\multirow{2}{*}{20} & square	& 4.46 & 3.23 & 27.6   \\
+							& cubic		& 4.35 & 3.83 & 12.0   \\
 		\midrule
-		\multirow{2}{*}{30} & square	& 4.57 & 3.20 \\
-		& cubic		& 5.00 & 3.72 \\
+		\multirow{2}{*}{30} & square	& 4.57 & 3.20 & 30.0   \\
+							& cubic		& 5.00 & 3.72 & 25.6   \\
 		\midrule
-		\multirow{2}{*}{50} & square	& 9.27 & 7.53 \\
-		& cubic		& 9.69 & 8.93 \\
+		\multirow{2}{*}{50} & square	& 9.27 & 7.53 & 18.8   \\
+							& cubic		& 9.69 & 8.93 & { 7.8} \\
 		\bottomrule
-	\end{tabular}
+		\end{tabular}
+		\begin{tablenotes}
+			\footnotesize
+			\item[*] $ \text{Decrease rate} = 100 \times \left( \text{Before} - \text{After} \right) / \text{Before}$
+		\end{tablenotes}
+	\end{threeparttable}
 \end{table}
 
-\begin{table}[ht!]
+% [Referee 1] Comment 7
+\begin{table}[H]
 	\caption{Epistasis of the original and modified basis sampling in the $NK$-landscape problem.} \label{tab:epi_nk}
 	\vspace*{0.2cm}
 	\centering
-	\begin{tabular}{ccc}
-		\toprule
-		\multirow{2}{*}{$ N,\, K $} & \multicolumn{2}{c}{Epistasis} \\	\cmidrule(lr){2-3}
-		& before & after \\
-		\midrule
-		20, 3	& $ 3.17e^{-3} $ & $ 2.25e^{-3} $ \\
-		20, 5	& $ 3.16e^{-3} $ & $ 2.90e^{-3} $ \\
-		20, 10	& $ 4.28e^{-3} $ & $ 3.82e^{-3} $ \\
-		30, 3	& $ 1.85e^{-3} $ & $ 1.60e^{-3} $ \\
-		30, 5	& $ 2.61e^{-3} $ & $ 2.37e^{-3} $ \\
-		30, 10	& $ 2.68e^{-3} $ & $ 2.39e^{-3} $ \\
-		30, 20	& $ 2.78e^{-3} $ & $ 2.50e^{-3} $ \\
-		50, 3	& $ 1.13e^{-3} $ & $ 9.32e^{-4}  $ \\
-		\bottomrule
-	\end{tabular}
+	\begin{threeparttable}
+		\begin{tabular}{r@{, }lccc}
+			\toprule
+			\multicolumn{2}{c}{\multirow{2.5}{*}{$ N,\, K $}} & \multicolumn{3}{c}{Epistasis} \\	\cmidrule(lr){3-5}
+			\thead{} & & Before & After & Decrease rate (\%)\tnote{*} \\
+			\midrule
+			20 & 3	& $ 3.17e^{-3} $ & $ 2.25e^{-3} $ & 29.0    \\
+			20 & 5	& $ 3.16e^{-3} $ & $ 2.90e^{-3} $ & { 8.2}  \\
+			20 & 10	& $ 4.28e^{-3} $ & $ 3.82e^{-3} $ & 10.7    \\
+			30 & 3	& $ 1.85e^{-3} $ & $ 1.60e^{-3} $ & 13.5    \\
+			30 & 5	& $ 2.61e^{-3} $ & $ 2.37e^{-3} $ & { 9.2}  \\
+			30 & 10	& $ 2.68e^{-3} $ & $ 2.39e^{-3} $ & 10.8    \\
+			30 & 20	& $ 2.78e^{-3} $ & $ 2.50e^{-3} $ & 10.1    \\
+			50 & 3	& $ 1.13e^{-3} $ & $ 9.32e^{-4} $ & 17.5    \\
+			\bottomrule
+		\end{tabular}
+		\begin{tablenotes}
+			\footnotesize
+			\item[*] $ \text{Decrease rate} = 100 \times \left( \text{Before} - \text{After} \right) / \text{Before}$
+		\end{tablenotes}
+	\end{threeparttable}
 \end{table}
 
 
@@ -523,7 +545,7 @@ Furthermore, the experiment evaluated specific problems that could be simplified
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Appendix}
-We present the following lemma to prove Proposition 3:
+We present the following lemma to prove Proposition~\ref{prop:myprop}:
 \begin{lemma}
 	Let $ M=(m_{ij}) $ be an $ n\times n $ binary matrix. For each $ i $ and $ j $ such that $ i\neq j $, the following four rules hold.
 	\begin{enumerate}[label=(\roman*)]
@@ -590,7 +612,11 @@ We present the following lemma to prove Proposition 3:
 		Row_j (A_n^{ji} A_n^{ij} M)&=Row_j (A_n^{ij} M)=Row_i (M)+Row_i (M) = m_i+m_j .
 		\end{align*}
 		\item 	We know $ A_n^{ij} S_n^{ij} = A_n^{ji} A_n^{ij} $. We multiply $ A_n^{ij} $ in both sides. Then, the left side is $ A_n^{ij} A_n^{ij} S_n^{ij}=I_n S_n^{ij}=S_n^{ij} $, and so $ S_n^{ij}=A_n^{ij} A_n^{ji} A_n^{ij} $.
-	\end{enumerate}
+		\item $ S_n^{ij} = S_n^{ji} $ by the definition of $ S_n^{ij} $. Now, consider the euqation $ S_n^{ij}A_n^{ji} = S_n^{ji}A_n^{ji} $. Note that the left side
+		\[S_n^{ij}A_n^{ji} = \left( A_n^{ij}A_n^{ji}A_n^{ij}\right)A_n^{ji} = \left(A_n^{ij}A_n^{ji}\right)^2,\]
+		and note that the right side
+		\[ S_n^{ji}A_n^{ji} = \left(A_n^{ji}A_n^{ij}A_n^{ji}\right)A_n^{ji} = \left(A_n^{ji}A_n^{ij}\right)\left(A_n^{ji}\right)^2 = A_n^{ji}A_n^{ij} . \] 
+	\end{enumerate} 
 \end{proof}
 
 \section*{Data Availability}
@@ -600,5 +626,8 @@ The data used to support the findings of this study are included within the arti
 The authors declare that they have no conflicts of interest.
 
 \section*{Acknowledgment}
-This research was supported by a grant [KCG-01-2017-05] through the Disaster and Safety Management Institute funded by Korea Coast Guard of Korean government.
+The present research has been conducted by the Research Grant of Kwangwoon University in 2019.
+This research was supported by a grant (KCG-01-2017-05) through the Disaster and Safety Management Institute funded by Korea Coast Guard of Korean government, and by Basic Science Research Program through the National Research Foundation of Korea (NRF) funded by the Ministry of Education (No. 2015R1D1A1A01060105).
+
+%This research was supported by a grant [KCG-01-2017-05] through the Disaster and Safety Management Institute funded by Korea Coast Guard of Korean government.
 %This research was supported by Basic Science Research Program through the National Research Foundation of Korea (NRF) funded by the Ministry of Education (No. 2015R1D1A1A01060105).
